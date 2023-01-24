@@ -16,5 +16,6 @@
   },
   "dependencies": {
     "puppeteer": "^19.6.0"
-  }
+  },
+  "type": "module"
 }
