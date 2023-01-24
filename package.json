@@ -1,0 +1,20 @@
+{
+  "name": "libreriasydrivers",
+  "version": "1.0.0",
+  "description": "Automatizacion para detectar cambios en los drivers de las librerias",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Elard",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.32.0"
+  },
+  "dependencies": {
+    "puppeteer": "^19.6.0"
+  }
+}
