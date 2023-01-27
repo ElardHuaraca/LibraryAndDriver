@@ -1,8 +1,10 @@
 import puppeteer from 'puppeteer'
 
+const ListDrivers = []
+
 const AccesPage = async (ip) => {
 
-    const browser = await puppeteer.launch({ headless: true, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
+    const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
     const page = await browser.newPage()
     await page.goto("http://10.0.88.34/login.php")
 
@@ -24,8 +26,8 @@ const AccesPage = async (ip) => {
         if (user === 'ehuaraca') await username[index].click()
     }
 
-    await page.type("#logPwd", "password2023*")
-    await page.click("#BTNLOGIN")
+    await page.type('#logPwd', 'password2023*')
+    await page.click('#BTNLOGIN')
 
     /* wait page load content */
     await page_load_2
@@ -55,9 +57,29 @@ const AccesPage = async (ip) => {
     const open = await table.$('#drivenum > .expandable-field-section.open')
     if (open) await (await open.$('.open-close-button')).click()
 
+    table.$$('#drivenum').then(rows => {
+        rows.forEach(async row => {
+            const div_log_num = await row.$('#DRIVE_LOG_NUM')
+            const div_status = await row.$('#DRIVE_STATUS')
+            const div_activity = await row.$('#DRIVE_ACTIVITY')
+
+            const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
+            const text_class = await (await div_status.getProperty('className')).jsonValue()
+            const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
+
+            ListDrivers.push({
+                id: text_num,
+                status: text_class,
+                process: text_activity
+            })
+        })
+    })
+
     /* Take a screenshot */
     await page.screenshot({ path: "google.png" })
     await browser.close()
+
+    return ListDrivers
 }
 
 export default AccesPage
