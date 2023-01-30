@@ -1,8 +1,8 @@
 import AccesPage from './src/AccesPage.js'
-import { ReadFile, WriteFile } from './src/ReadAndCreateFile.js'
+import { ReadFileFromJson, WriteFile } from './src/ReadAndCreateFile.js'
 
 /* read file json localy */
-const libraries = ReadFile()
+const libraries = ReadFileFromJson()
 
 /* Loop array content and get information by library */
 const array = await Promise.all(
