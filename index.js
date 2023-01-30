@@ -14,6 +14,6 @@ const array = await Promise.all(
     })
 )
 
-WriteFile(array)
+await WriteFile(array)
 
 await SMTPMail()
