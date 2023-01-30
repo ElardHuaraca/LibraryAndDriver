@@ -40,7 +40,3 @@ export function WriteFile(listLibrary) {
         file.end()
     })
 }
-
-/* Delete file created */
-export function DeleteFile() {
-}
