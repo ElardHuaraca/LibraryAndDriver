@@ -16,16 +16,16 @@ export async function WriteFile(listLibrary) {
     file.on('ready', () => {
         file.write('<table style="border-collapse:collapse; width:100%" border="1">')
         file.write('<thead><tr><th scope="col">Libreria</th><th scope="col">Drives</th><th scope="col">Estatus</th><th scope="col">Proceso</th><th scope="col">IP</th></tr></thead>')
-        file.write('<tbody class="text-align:center">')
+        file.write('<tbody style="text-align:center">')
         listLibrary.forEach((item) => {
             const { library, drivers } = item
-            file.write(`<tr><td rowspan="${drivers.length}" class="align-middle">${library.name}</td>`)
+            file.write(`<tr><td rowspan="${drivers.length}">${library.name}</td>`)
             drivers.forEach((driver, index) => {
                 if (index > 0) file.write('<tr>')
                 file.write(`<td>Drive ${driver.id}</td>`)
                 file.write(`<td>${driver.status}</td>`)
                 file.write(`<td>${driver.process}</td>`)
-                if (index == 0) file.write(`<td rowspan="${drivers.length}" class="align-middle"><a href="http://${library.ip}">${library.ip}</a></td>`)
+                if (index == 0) file.write(`<td rowspan="${drivers.length}"><a href="http://${library.ip}">${library.ip}</a></td>`)
                 file.write('</tr>')
             })
         })
