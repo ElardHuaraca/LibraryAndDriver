@@ -31,7 +31,7 @@ const AccesPage = async (ip) => {
         if (user === 'ehuaraca') await username[index].click()
     }
 
-    await page.type('#logPwd', 'password2023*')
+    await page.type('#logPwd', process.env.PASSWORD)
     await page.click('#BTNLOGIN')
 
     /* wait page load content */
