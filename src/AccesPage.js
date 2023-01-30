@@ -2,6 +2,11 @@ import puppeteer from 'puppeteer'
 
 const ListDrivers = []
 
+const STATUS = {
+    'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
+    'DEFAULT': 'WARNING',
+}
+
 const AccesPage = async (ip) => {
 
     const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
@@ -69,7 +74,7 @@ const AccesPage = async (ip) => {
 
             ListDrivers.push({
                 id: text_num,
-                status: text_class,
+                status: STATUS[text_class] || STATUS['DEFAULT'],
                 process: text_activity
             })
         })
