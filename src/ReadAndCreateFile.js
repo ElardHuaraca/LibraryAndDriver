@@ -14,13 +14,9 @@ export function ReadFileFromJson() {
 export function WriteFile(listLibrary) {
     const file = fs.createWriteStream('libraries.html')
     file.on('ready', () => {
-        file.write('<!DOCTYPE html>')
-        file.write('<html lang="en">')
-        file.write('<head><title>Libraries</title>')
-        file.write('</head><body>')
-        file.write('<table class="table table-bordered border-dark text-center">')
+        file.write('<table style="border-collapse:collapse; width:100%" border="1">')
         file.write('<thead><tr><th scope="col">Libreria</th><th scope="col">Drives</th><th scope="col">Estatus</th><th scope="col">Proceso</th><th scope="col">IP</th></tr></thead>')
-        file.write('<tbody>')
+        file.write('<tbody class="text-align:center">')
         listLibrary.forEach((item) => {
             const { library, drivers } = item
             file.write(`<tr><td rowspan="${drivers.length}" class="align-middle">${library.name}</td>`)
@@ -35,8 +31,10 @@ export function WriteFile(listLibrary) {
         })
         file.write('</tbody>')
         file.write('</table>')
-        file.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">')
-        file.write('</body></html>')
         file.end()
     })
+}
+
+export function DeleteFile(filename) {
+    fs.unlinkSync(filename)
 }
