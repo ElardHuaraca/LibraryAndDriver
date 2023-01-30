@@ -1,7 +1,5 @@
 import puppeteer from 'puppeteer'
 
-const ListDrivers = []
-
 const STATUS = {
     'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
     'DEFAULT': 'WARNING',
@@ -9,9 +7,11 @@ const STATUS = {
 
 const AccesPage = async (ip) => {
 
+    const ListDrivers = []
+
     const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
     const page = await browser.newPage()
-    await page.goto("http://10.0.88.34/login.php")
+    await page.goto(`http://${ip}/login.php`)
 
     /* configurations */
     await page.setViewport({ width: 1366, height: 720 })
