@@ -1,9 +1,13 @@
 import puppeteer from 'puppeteer'
+import dotenv from 'dotenv'
 
 const STATUS = {
     'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
     'DEFAULT': 'WARNING',
 }
+
+dotenv.config()
+
 
 const AccesPage = async (ip) => {
 
