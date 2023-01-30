@@ -11,7 +11,7 @@ export function ReadFileFromJson() {
 }
 
 /* Write new file .html and content libraries information */
-export function WriteFile(listLibrary) {
+export async function WriteFile(listLibrary) {
     const file = fs.createWriteStream('libraries.html')
     file.on('ready', () => {
         file.write('<table style="border-collapse:collapse; width:100%" border="1">')
@@ -33,6 +33,8 @@ export function WriteFile(listLibrary) {
         file.write('</table>')
         file.end()
     })
+
+    await new Promise((r) => { setTimeout(r, 10) })
 }
 
 export function DeleteFile(filename) {
