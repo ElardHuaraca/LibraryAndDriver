@@ -1,10 +1,9 @@
 import AccesPage from './src/AccesPage.js'
-import fs from 'fs'
+import { ReadFile } from './src/ReadAndCreateFile.js'
 
 /* read file json localy */
-fs.readFile('./drivers.json', 'utf8', async (err, data) => {
+const libraries = ReadFile()
+
+libraries.forEach(async (library) => {
+    const listDrivers = await AccesPage(library.ip)
 })
-
-const listDrivers = await AccesPage()
-
-console.log(listDrivers)
