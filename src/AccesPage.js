@@ -27,10 +27,10 @@ const AccesPage = async (ip) => {
     const username = await page.$$('.group-option')
     for (let index = 0; index < username.length; index++) {
         const user = await (await username[index].getProperty('innerText')).jsonValue()
-        if (user === process.env.USERNAME) await username[index].click()
+        if (user === process.env.USERNAME_LIB) await username[index].click()
     }
 
-    await page.type('#logPwd', process.env.PASSWORD)
+    await page.type('#logPwd', process.env.PASSWORD_LIB)
     await page.click('#BTNLOGIN')
 
     /* wait page load content */
