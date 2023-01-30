@@ -1,9 +1,7 @@
 import nodemailer from 'nodemailer'
-import { ReadFile } from './ReadAndCreateFile.js'
+import { ReadFile, DeleteFile } from './ReadAndCreateFile.js'
 
 const smtpMail = async () => {
-
-    console.log(process.env.EMAIL_SMTP)
 
     let transporter = nodemailer.createTransport({
         host: 'smtp-mail.outlook.com',
@@ -21,6 +19,8 @@ const smtpMail = async () => {
         subject: 'TEST REPORTE LIBRERIAS',
         html: ReadFile('libraries.html')
     })
+
+    DeleteFile('libraries.html')
 }
 
 export default smtpMail
