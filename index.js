@@ -1,6 +1,9 @@
 import AccesPage from './src/AccesPage.js'
 import { ReadFileFromJson, WriteFile } from './src/ReadAndCreateFile.js'
+import SMTPMail from './src/SMTPMail.js'
+import dotenv from 'dotenv'
 
+dotenv.config()
 /* read file json localy */
 const libraries = ReadFileFromJson()
 
@@ -12,3 +15,5 @@ const array = await Promise.all(
 )
 
 WriteFile(array)
+
+await SMTPMail()
