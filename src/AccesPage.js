@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer'
 const STATUS = {
+    'DRIVE_STATUS': 'N.A.',
     'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
     'DEFAULT': 'WARNING',
 }
@@ -8,7 +9,7 @@ const AccesPage = async (ip) => {
 
     const ListDrivers = []
 
-    const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
+    const browser = await puppeteer.launch({ headless: true, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
     const page = await browser.newPage()
     await page.goto(`http://${ip}/login.php`)
 
@@ -74,7 +75,7 @@ const AccesPage = async (ip) => {
             ListDrivers.push({
                 id: text_num,
                 status: STATUS[text_class] || STATUS['DEFAULT'],
-                process: text_activity
+                process: text_activity || 'N.A.'
             })
         })
     })
