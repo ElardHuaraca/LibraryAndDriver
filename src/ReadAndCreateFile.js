@@ -14,9 +14,10 @@ export function ReadFileFromJson() {
 export async function WriteFile(listLibrary) {
     const file = fs.createWriteStream('libraries.html')
     file.on('ready', () => {
-        file.write('<table style="border-collapse:collapse; width:100%" border="1">')
+        file.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Libraries</title></head><body>')
+        file.write('<table style="border-collapse:collapse; width:100%;text-align:center;" border="1">')
         file.write('<thead><tr><th scope="col">Libreria</th><th scope="col">Drives</th><th scope="col">Estatus</th><th scope="col">Proceso</th><th scope="col">IP</th></tr></thead>')
-        file.write('<tbody style="text-align:center">')
+        file.write('<tbody>')
         listLibrary.forEach((item) => {
             const { library, drivers } = item
             file.write(`<tr><td rowspan="${drivers.length}">${library.name}</td>`)
@@ -30,7 +31,7 @@ export async function WriteFile(listLibrary) {
             })
         })
         file.write('</tbody>')
-        file.write('</table>')
+        file.write('</table></body></html>')
         file.end()
     })
 
