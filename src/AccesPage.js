@@ -5,7 +5,7 @@ const STATUS = {
     'DEFAULT': 'WARNING',
 }
 
-const AccesPage = async (ip) => {
+const AccesPage = async (ip, user_, password_) => {
 
     const ListDrivers = []
 
@@ -21,17 +21,21 @@ const AccesPage = async (ip) => {
     const sleep = async (ms = 1000) => await new Promise(r => setTimeout(r, ms))
 
     /* Authenticate and user selected in list*/
-    await page.waitForSelector('#slctAccount_chosen')
-    const div = await page.$('#slctAccount_chosen')
-    await div.click()
+    try { await page.waitForSelector('#slctAccount_chosen', { timeout: 5000 }) }
+    catch (e) { }
 
-    const username = await page.$$('.group-option')
-    for (let index = 0; index < username.length; index++) {
-        const user = await (await username[index].getProperty('innerText')).jsonValue()
-        if (user === process.env.USERNAME_LIB) await username[index].click()
+    const div = await page.$('#slctAccount_chosen')
+    div == null ? '' : await div.click()
+
+    if (div != null) {
+        const username = await page.$$('.group-option')
+        for (let index = 0; index < username.length; index++) {
+            const user = await (await username[index].getProperty('innerText')).jsonValue()
+            if (user === (user_ || process.env.USERNAME_LIB)) await username[index].click()
+        }
     }
 
-    await page.type('#logPwd', process.env.PASSWORD_LIB)
+    await page.type('#logPwd', password_ || process.env.PASSWORD_LIB)
     await page.click('#BTNLOGIN')
 
     /* wait page load content */
@@ -75,7 +79,7 @@ const AccesPage = async (ip) => {
             ListDrivers.push({
                 id: text_num,
                 status: STATUS[text_class] || STATUS['DEFAULT'],
-                process: text_activity || 'N.A.'
+                process: text_activity == '' ? 'N.A.' : text_activity
             })
         })
     })
