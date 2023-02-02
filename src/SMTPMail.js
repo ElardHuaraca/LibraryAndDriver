@@ -15,8 +15,8 @@ const smtpMail = async () => {
 
     await transporter.sendMail({
         from: process.env.EMAIL_SMTP,
-        to: process.env.EMAIL_SMTP,
-        subject: 'TEST REPORTE LIBRERIAS',
+        to: process.env.FROM_SMTP,
+        subject: 'REPORTE LIBRERIAS ROBOTICAS',
         html: ReadFile('libraries.html')
     })
 
