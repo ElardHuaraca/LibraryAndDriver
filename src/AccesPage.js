@@ -85,7 +85,7 @@ const AccesPage = async (ip, user_, password_) => {
                 id: text_num,
                 status: STATUS[text_class] || STATUS['DEFAULT'],
                 process: text_activity,
-                powefull: text_enable,
+                powerfull: text_enable,
                 serial: text_serial,
             })
         })
