@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer'
 
 const STATUS = {
-    'DRIVE_STATUS': '',
+    'DRIVE_STATUS': 'N.A.',
     'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
     'DEFAULT': 'WARNING',
 }
@@ -84,7 +84,7 @@ const AccesPage = async (ip, user_, password_) => {
             ListDrivers.push({
                 id: text_num,
                 status: STATUS[text_class] || STATUS['DEFAULT'],
-                process: text_activity,
+                process: text_activity === ' ' ? 'N.A.' : text_activity,
                 powerfull: text_enable,
                 serial: text_serial,
             })
