@@ -78,7 +78,7 @@ const AccesPage = async (ip, user_, password_) => {
             const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
             const text_class = await (await div_status.getProperty('className')).jsonValue()
             const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
-            const text_enable = await (await div_enable.getProperties('textContent')).jsonValue()
+            const text_enable = await (await div_enable.getProperty('textContent')).jsonValue()
             const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
 
             ListDrivers.push({
