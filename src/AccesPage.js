@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer'
+
 const STATUS = {
-    'DRIVE_STATUS': 'N.A.',
+    'DRIVE_STATUS': '',
     'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
     'DEFAULT': 'WARNING',
 }
@@ -71,15 +72,21 @@ const AccesPage = async (ip, user_, password_) => {
             const div_log_num = await row.$('#DRIVE_LOG_NUM')
             const div_status = await row.$('#DRIVE_STATUS')
             const div_activity = await row.$('#DRIVE_ACTIVITY')
+            const div_enable = await row.$('#DRIVE_ENABLED_HEAD')
+            const div_serial = await row.$('#DRIVE_SERIAL_NO')
 
             const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
             const text_class = await (await div_status.getProperty('className')).jsonValue()
             const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
+            const text_enable = await (await div_enable.getProperties('textContent')).jsonValue()
+            const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
 
             ListDrivers.push({
                 id: text_num,
                 status: STATUS[text_class] || STATUS['DEFAULT'],
-                process: text_activity == '' ? 'N.A.' : text_activity
+                process: text_activity,
+                powefull: text_enable,
+                serial: text_serial,
             })
         })
     })
