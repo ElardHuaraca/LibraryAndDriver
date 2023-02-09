@@ -10,7 +10,8 @@ const libraries = ReadFileFromJson()
 /* Loop array content and get information by library */
 const array = await Promise.all(
     libraries.map(async (library) => {
-        return { library: library, drivers: await AccesPage(library.ip, library.user, library.password) }
+        const version_ = library.name.split('_')[0].slice(3)
+        return { library: library, drivers: await AccesPage(library.ip, library.user, library.password, version_) }
     })
 )
 
