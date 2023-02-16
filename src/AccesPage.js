@@ -129,7 +129,31 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
     await page_load_2
 
     /* find frame and click on button respect */
-    const frame = getFrame(page, 'tabs')
+    let frame = getFrame(page, 'tabs')
+
+    /* click btn drive */
+    await frame.$eval('#drive_information', element => element.click())
+
+    await sleep(3000)
+
+    /* get information Drive id, serial number of drive */
+    let frame_main = getFrame(page, 'main')
+    const list_ = await frame_main.$$eval('.dataTable', elements => {
+        const list = []
+        elements.forEach(element => {
+            const id = element.querySelector('thead > tr > th:nth-child(2)')
+            const serial = element.querySelector('tbody > tr:nth-child(3) > td:nth-child(2)')
+            const id_string = id.textContent.split(' ')[0].trim()
+            const serial_string = serial.textContent.trim()
+            list.push({ id: `Drive ${id_string}`, serial: serial_string })
+        })
+
+        return list
+    })
+
+    ListDrivers.push(...list_)
+
+    /* Click on button for view status*/
     await frame.$eval('#status', element => element.click())
 
     /* wait page load content */
@@ -144,10 +168,14 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
     await btn_driver_status.click()
 
     /* wait page load content */
-    await sleep(6000)
+    await sleep(3000)
 
-    await page.waitForSelector('#main')
-    const table = await page.$('#main')
+    frame_main = getFrame(page, 'main')
+    await frame_main.$$eval('.dataTable', elements => {
+        elements.forEach(element => {
+
+        })
+    })
 
     table.$$('.dataTable').then(rows => {
         rows.forEach(async (row) => {
