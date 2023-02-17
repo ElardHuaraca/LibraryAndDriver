@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer'
 const STATUS = {
     'DRIVE_STATUS': 'N.A.',
     'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
+    'Ready': 'OK',
     'DEFAULT': 'WARNING',
 }
 
@@ -145,7 +146,7 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
             const serial = element.querySelector('tbody > tr:nth-child(3) > td:nth-child(2)')
             const id_string = id.textContent.split(' ')[0].trim()
             const serial_string = serial.textContent.trim()
-            list.push({ id: `Drive ${id_string}`, serial: serial_string })
+            list.push({ id: id_string, serial: `S/N ${serial_string}` })
         })
 
         return list
@@ -162,43 +163,31 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
     /* click on btn status */
     await frame.$eval('#drive_status', element => element.click())
 
-    /* Click on button for view status drivers*/
-    await page.waitForSelector('#drive_status')
-    const btn_driver_status = await page.$('#drive_status')
-    await btn_driver_status.click()
-
     /* wait page load content */
     await sleep(3000)
 
     frame_main = getFrame(page, 'main')
-    await frame_main.$$eval('.dataTable', elements => {
+    const list__ = await frame_main.$$eval('.dataTable', elements => {
+        const list = []
         elements.forEach(element => {
-
+            const id = element.querySelector('thead > tr > th')
+            const status = element.querySelector('tbody > tr:nth-child(1) > td:nth-child(2)')
+            const process = element.querySelector('tbody > tr:nth-child(7) > td:nth-child(2)')
+            const id_string = id.textContent.substring(8, 9).trim()
+            const status_string = status.textContent.trim()
+            const process_string = process.textContent.trim()
+            list.push({ id: id_string, status: status_string, process: process_string, powerfull: 'N.A.' })
         })
+        return list
     })
 
-    table.$$('.dataTable').then(rows => {
-        rows.forEach(async (row) => {
-            const div_log_num = await row.$('#DRIVE_LOG_NUM')
-            const div_status = await row.$('#DRIVE_STATUS')
-            const div_activity = await row.$('#DRIVE_ACTIVITY')
-            const div_enable = await row.$('#DRIVE_ENABLED_HEAD')
-            const div_serial = await row.$('#DRIVE_SERIAL_NO')
-
-            const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
-            const text_class = await (await div_status.getProperty('className')).jsonValue()
-            const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
-            const text_enable = await (await div_enable.getProperty('textContent')).jsonValue()
-            const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
-
-            ListDrivers.push({
-                id: text_num,
-                status: STATUS[text_class] || STATUS['DEFAULT'],
-                process: text_activity === ' ' ? 'N.A.' : text_activity,
-                powerfull: text_enable,
-                serial: text_serial,
-            })
-        })
+    list__.forEach(element => {
+        const index = ListDrivers.findIndex(e => e.id === element.id)
+        if (index !== -1) {
+            ListDrivers[index].status = STATUS[element.status] || STATUS['DEFAULT']
+            ListDrivers[index].process = element.process
+            ListDrivers[index].powerfull = element.powerfull
+        }
     })
 
     /* Take a screenshot */
