@@ -7,6 +7,18 @@ const STATUS = {
     'DEFAULT': 'WARNING',
 }
 
+
+const URL_BY_VERSION = (version, ip) => {
+    switch (version) {
+        case '6480':
+            return `http://${ip}/login.php`
+        case '3040':
+            return `http://${ip}/login.php`
+        case '2024':
+            return `http://${ip}/login.ssi`
+    }
+}
+
 const LIBRARIES_VERSION = async (...args) => {
     const [page, user_, password_, page_load_2, page_load_1, sleep, ListDrivers, browser, version] = args
 
@@ -24,10 +36,19 @@ const AccesPage = async (ip, user_, password_, version_) => {
 
     const ListDrivers = []
 
-    const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox", "--disable-features=site-per-process"] })
+    const browser = await puppeteer.launch({ headless: true, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
     const page = await browser.newPage()
-    await page.goto(`http://${ip}/login.ssi`)
-
+    try {
+        await page.goto(URL_BY_VERSION(version_, ip))
+    } catch (e) {
+        return [{
+            id: 'N.A.',
+            status: 'N.A.',
+            process: 'N.A.',
+            powerfull: 'N.A.',
+            serial: 'N.A.'
+        }]
+    }
     /* configurations */
     await page.setViewport({ width: 1366, height: 720 })
 
@@ -43,7 +64,8 @@ async function Libary6480(page, user_, password_, page_load_2, page_load_1, slee
     try { await page.waitForSelector('#slctAccount_chosen', { timeout: 5000 }) }
     catch (e) { }
 
-    const div = await page.$('#slctAccount_chosen')
+    let div = await page.$('#slctAccount_chosen')
+    div ??= await page.$('#slctAccount')
     div == null ? '' : await div.click()
 
     if (div != null) {
