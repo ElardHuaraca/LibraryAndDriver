@@ -18,7 +18,7 @@ const smtpMail = async () => {
         to: process.env.FROM_SMTP,
         subject: 'REPORTE LIBRERIAS ROBOTICAS',
         html: ReadFile('libraries.html')
-    })
+    }).catch(err => console.log(err))
 
     DeleteFile('libraries.html')
 }
