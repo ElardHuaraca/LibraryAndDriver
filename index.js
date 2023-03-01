@@ -9,15 +9,25 @@ EventEmitter.setMaxListeners(0)
 dotenv.config()
 /* read file json localy */
 const libraries = ReadFileFromJson()
+const array = []
 
 /* Loop array content and get information by library */
-const array = await Promise.all(
-    libraries.map(async (library) => {
+for (let [index, library] of libraries.entries()) {
+    const isEnd = index + 1 === libraries.length
+    const version_ = library.name.split('_')[0].slice(3)
+    const drivers = await AccesPage(library.ip, library.user, library.password, version_, isEnd)
+    array.push({ library: library, drivers: drivers })
+}
+
+/*
+await Promise.all(
+    libraries.map(async (library, index) => {
         const version_ = library.name.split('_')[0].slice(3)
-        return { library: library, drivers: await AccesPage(library.ip, library.user, library.password, version_) }
+        const drivers = await AccesPage(library.ip, library.user, library.password, version_, index == libraries.lenght)
+        return { library: this, drivers: drivers }
     })
 )
-
+ */
 await WriteFile(array)
 
 await SMTPMail()
