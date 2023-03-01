@@ -1,13 +1,22 @@
 import puppeteer from 'puppeteer'
 
-const STATUS = {
-    'DRIVE_STATUS': 'N.A.',
-    'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
-    'Ready': 'OK',
-    'Writing': 'OK',
-    'DEFAULT': 'WARNING',
-}
+const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
 
+const LIBRARIES_VERSION = async (...args) => {
+    const [page, user_, password_, page_load_2, page_load_1, sleep, version, isEnd] = args
+    switch (version) {
+        case '6480':
+            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+        case '3040':
+            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+        case '2024':
+            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+        case '4048':
+            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+        case '4300':
+            return await Libary4300(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+    }
+}
 
 const URL_BY_VERSION = (version, ip) => {
     switch (version) {
@@ -24,27 +33,17 @@ const URL_BY_VERSION = (version, ip) => {
     }
 }
 
-const LIBRARIES_VERSION = async (...args) => {
-    const [page, user_, password_, page_load_2, page_load_1, sleep, browser, version] = args
-
-    switch (version) {
-        case '6480':
-            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, browser)
-        case '3040':
-            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, browser)
-        case '2024':
-            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, browser)
-        case '4048':
-            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, browser)
-        case '4300':
-            return await Libary4300(page, user_, password_, page_load_2, page_load_1, sleep, browser)
-    }
+const STATUS = {
+    'DRIVE_STATUS': 'N.A.',
+    'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
+    'Ready': 'OK',
+    'Writing': 'OK',
+    'DEFAULT': 'WARNING',
 }
 
-const AccesPage = async (ip, user_, password_, version_) => {
-
-    const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
+const AccesPage = async (ip, user_, password_, version_, isEnd) => {
     const page = await browser.newPage()
+
     try {
         await page.goto(URL_BY_VERSION(version_, ip))
     } catch (e) {
@@ -62,12 +61,11 @@ const AccesPage = async (ip, user_, password_, version_) => {
     const page_load_1 = page.waitForNavigation({ waitUntil: 'networkidle0' })
     const page_load_2 = page.waitForNavigation({ waitUntil: 'networkidle2' })
     const sleep = async (ms = 1000) => await new Promise(r => setTimeout(r, ms))
-
     /* Authenticate and user selected in list*/
-    return await LIBRARIES_VERSION(page, user_, password_, page_load_2, page_load_1, sleep, browser, version_)
+    return await LIBRARIES_VERSION(page, user_, password_, page_load_2, page_load_1, sleep, version_, isEnd)
 }
 
-async function Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, browser) {
+async function Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
     const ListDrivers = []
     try { await page.waitForSelector('#slctAccount_chosen', { timeout: 5000 }) }
     catch (e) { }
@@ -86,7 +84,8 @@ async function Libary6480(page, user_, password_, page_load_2, page_load_1, slee
     }
 
     await page.type('#logPwd', password_ || process.env.PASSWORD_LIB)
-    await page.click('#BTNLOGIN')
+    const btn = await page.$('#BTNLOGIN')
+    await btn.click()
 
     /* wait page load content */
     await page_load_2
@@ -170,10 +169,13 @@ async function Libary6480(page, user_, password_, page_load_2, page_load_1, slee
     console.log(list)
     return list
 }) */
+    if (isEnd) await browser.close()
+    else await page.close()
+
     return ListDrivers.concat(list_)
 }
 
-async function Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, browser) {
+async function Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
     const ListDrivers = []
 
     await page.waitForSelector('#ButtonRegion')
@@ -214,6 +216,7 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
     await frame.$eval('#status', element => element.click())
 
     /* wait page load content */
+    await frame.waitForSelector('#drive_status')
     await sleep(3000)
 
     /* click on btn status */
@@ -246,13 +249,16 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
         }
     })
 
+    if (isEnd) await browser.close()
+    else await page.close()
+
     return ListDrivers
 }
 
-async function Libary4300(page, user_, password_, page_load_2, page_load_1, sleep, browser) {
+async function Libary4300(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
     const ListDrivers = []
     try { await page.waitForSelector('#slctAccount', { timeout: 5000 }) }
-    catch (e) { }
+    catch (e) { console.log(e) }
 
     await page.type('#slctAccount', user_ || process.env.USERNAME_LIB)
     await page.type('#logPwd', password_ || process.env.PASSWORD_LIB)
@@ -294,6 +300,9 @@ async function Libary4300(page, user_, password_, page_load_2, page_load_1, slee
             })
         })
     })
+
+    if (isEnd) await browser.close()
+    else await page.close()
 
     return ListDrivers
 }
