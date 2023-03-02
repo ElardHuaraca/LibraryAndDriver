@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer'
+import './Extensions/ElementHandle.js'
 
 const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
 
@@ -38,6 +39,7 @@ const STATUS = {
     'DRIVE_STATUS OKbuttonDriveBullet OK': 'OK',
     'Ready': 'OK',
     'Writing': 'OK',
+    'Idle': 'OK',
     'DEFAULT': 'WARNING',
 }
 
@@ -136,43 +138,39 @@ async function Libary6480(page, user_, password_, page_load_2, page_load_1, slee
             status: STATUS[text_class] || STATUS['DEFAULT'],
             process: text_activity === ' ' ? 'N.A.' : text_activity,
             powerfull: text_enable === ' ' ? 'N.A.' : text_enable,
-            serial: text_serial === ' ' ? 'N.A.' : text_serial
+            serial: text_serial === ' ' ? 'N.A.' : text_serial,
         }
 
         return object
     }))
-    /* .then(rows => {
-    const list = []
-    console.log(rows)
-    rows.forEach(async (row) => {
-        console.log(row)
-        const div_log_num = await row.$('#DRIVE_LOG_NUM')
-        const div_status = await row.$('#DRIVE_STATUS')
-        const div_activity = await row.$('#DRIVE_ACTIVITY')
-        const div_enable = await row.$('#DRIVE_ENABLED_HEAD')
-        const div_serial = await row.$('#DRIVE_SERIAL_NO')
 
-        const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
-        const text_class = await (await div_status.getProperty('className')).jsonValue()
-        const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
-        const text_enable = await (await div_enable.getProperty('textContent')).jsonValue()
-        const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
+    /* detect if exist critical error */
+    const option = await page.$('#btnStackError')
+    const isVisible = await option.isVisible()
+    const criticals = []
+    if (isVisible) {
+        await option.click()
 
-        list.push({
-            id: text_num,
-            status: STATUS[text_class] || STATUS['DEFAULT'],
-            process: text_activity === ' ' ? 'N.A.' : text_activity,
-            powerfull: text_enable,
-            serial: text_serial,
-        })
-    })
-    console.log(list)
-    return list
-}) */
+        await page_load_2
+        await sleep(3000)
+
+        await page.waitForSelector('#id_TicketLogTableContainer')
+        const table = await page.$('#id_TicketLogTableContainer')
+        const columns = await table.$$('#CloneTargetEventsContent > .container-row.divTableBody')
+
+        const descriptions = await Promise.all(columns.map(async (row) => {
+            const description = await row.$('div:nth-child(4)')
+            const text_description = await (await description.getProperty('textContent')).jsonValue()
+            return { description: text_description }
+        }))
+
+        criticals.push(...descriptions)
+    } else { criticals.push({ description: 'N.A.' }) }
+
     if (isEnd) await browser.close()
     else await page.close()
 
-    return ListDrivers.concat(list_)
+    return { drivers: list_, criticals: criticals }
 }
 
 async function Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
