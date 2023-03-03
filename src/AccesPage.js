@@ -40,7 +40,8 @@ const STATUS = {
     'Ready': 'OK',
     'Writing': 'OK',
     'Idle': 'OK',
-    'DEFAULT': 'WARNING',
+    'Error': 'ERROR',
+    'DEFAULT': 'WARNING'
 }
 
 const AccesPage = async (ip, user_, password_, version_, isEnd) => {
@@ -68,7 +69,6 @@ const AccesPage = async (ip, user_, password_, version_, isEnd) => {
 }
 
 async function Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
-    const ListDrivers = []
     try { await page.waitForSelector('#slctAccount_chosen', { timeout: 5000 }) }
     catch (e) { }
 
@@ -174,7 +174,7 @@ async function Libary6480(page, user_, password_, page_load_2, page_load_1, slee
 }
 
 async function Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
-    const ListDrivers = []
+    let ListDrivers = []
 
     await page.waitForSelector('#ButtonRegion')
 
@@ -247,10 +247,25 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
         }
     })
 
+    /* Verify if status error exist in library */
+    const frame_left = getFrame(page, 'left')
+    const errors = await frame_left.$eval('#greyPanel>table>tbody>tr:nth-child(4)>td:nth-child(2)', element => {
+        console.log(element)
+        const name_src = element.querySelector('img').getAttribute('src')
+        const type_status = name_src.split('.')[0]
+        const isError = type_status === 'status_error'
+        if (isError) {
+            const message_error = element.querySelector('a').textContent
+            return [{ description: message_error }]
+        }
+        else { return [{ description: 'N.A.' }] }
+    })
+
+    console.log(errors)
+
     if (isEnd) await browser.close()
     else await page.close()
-
-    return ListDrivers
+    return { drivers: ListDrivers }
 }
 
 async function Libary4300(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
@@ -302,7 +317,7 @@ async function Libary4300(page, user_, password_, page_load_2, page_load_1, slee
     if (isEnd) await browser.close()
     else await page.close()
 
-    return ListDrivers
+    return { drivers: ListDrivers, criticals: [{ description: 'N.A.' }] }
 }
 
 function getFrame(page, name) {
