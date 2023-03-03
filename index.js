@@ -15,8 +15,8 @@ const array = []
 for (let [index, library] of libraries.entries()) {
     const isEnd = index + 1 === libraries.length
     const version_ = library.name.split('_')[0].slice(3)
-    const drivers = await AccesPage(library.ip, library.user, library.password, version_, isEnd)
-    array.push({ library: library, drivers: drivers })
+    const library_data = await AccesPage(library.ip, library.user, library.password, version_, isEnd)
+    array.push({ library: library, library_data: library_data })
 }
 
 /*
