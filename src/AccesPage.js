@@ -50,13 +50,16 @@ const AccesPage = async (ip, user_, password_, version_, isEnd) => {
     try {
         await page.goto(URL_BY_VERSION(version_, ip))
     } catch (e) {
-        return [{
-            id: 'N.A.',
-            status: 'N.A.',
-            process: 'N.A.',
-            powerfull: 'N.A.',
-            serial: 'N.A.'
-        }]
+        return {
+            drivers: [{
+                id: 'N.A.',
+                status: 'N.A.',
+                process: 'N.A.',
+                powerfull: 'N.A.',
+                serial: 'N.A.'
+            }],
+            criticals: [{ description: 'N.A' }]
+        }
     }
     /* configurations */
     await page.setViewport({ width: 1366, height: 720 })
@@ -261,11 +264,10 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
         else { return [{ description: 'N.A.' }] }
     })
 
-    console.log(errors)
-
     if (isEnd) await browser.close()
     else await page.close()
-    return { drivers: ListDrivers }
+
+    return { drivers: ListDrivers, criticals: errors }
 }
 
 async function Libary4300(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
