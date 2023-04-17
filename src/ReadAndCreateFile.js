@@ -1,7 +1,9 @@
 import fs from 'fs'
 
-export function ReadFile(filename) {
-    return fs.readFileSync(filename).toString()
+const FILENAME = "libraries.html"
+
+export function ReadFile() {
+    return fs.readFileSync(FILENAME).toString()
 }
 
 /* Read File libraries.json localy in project */
@@ -12,7 +14,10 @@ export function ReadFileFromJson() {
 
 /* Write new file .html and content libraries information */
 export async function WriteFile(listLibrary) {
-    const file = fs.createWriteStream('libraries.html')
+    /* detect if exist file */
+    if (fs.existsSync(FILENAME)) DeleteFile()
+
+    const file = fs.createWriteStream(FILENAME)
     file.on('ready', () => {
         file.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Libraries</title></head><body>')
         file.write('<table style="border-collapse:collapse; width:100%;text-align:center;" border="1">')
@@ -48,6 +53,6 @@ export async function WriteFile(listLibrary) {
     await new Promise((r) => { setTimeout(r, 10) })
 }
 
-export function DeleteFile(filename) {
-    fs.unlinkSync(filename)
+export function DeleteFile() {
+    fs.unlinkSync(FILENAME)
 }

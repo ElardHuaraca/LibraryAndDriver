@@ -17,10 +17,10 @@ const smtpMail = async () => {
         from: process.env.EMAIL_SMTP,
         to: process.env.FROM_SMTP,
         subject: 'REPORTE LIBRERIAS ROBOTICAS',
-        html: ReadFile('libraries.html')
-    }).catch(err => console.log(err))
-
-    DeleteFile('libraries.html')
+        html: ReadFile()
+    }).catch((error) => {
+        console.log(error)
+    })
 }
 
 export default smtpMail
