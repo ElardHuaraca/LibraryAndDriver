@@ -3,34 +3,31 @@ import { ReadFileFromJson, WriteFile } from './src/ReadAndCreateFile.js'
 import SMTPMail from './src/SMTPMail.js'
 import dotenv from 'dotenv'
 import { EventEmitter } from 'events'
+import cron from 'node-cron'
 
 EventEmitter.setMaxListeners(0)
 
 dotenv.config()
-/* read file json localy */
-const libraries = ReadFileFromJson()
-const array = []
 
-/* Loop array content and get information by library */
-for (let [index, library] of libraries.entries()) {
-    const isEnd = index + 1 === libraries.length
-    const version_ = library.name.split('_')[0].slice(3)
-    const library_data = await AccesPage(library.ip, library.user, library.password, version_, isEnd)
-    array.push({ library: library, library_data: library_data })
-}
+cron.schedule('0 8 * * *', async () => { await app() })
+cron.schedule('0 13 * * *', async () => { await app() })
+cron.schedule('0 17 * * *', async () => { await app() })
+cron.schedule('0 23 * * *', async () => { await app() })
 
-/*
-await Promise.all(
-    libraries.map(async (library, index) => {
+const app = async () => {
+    /* read file json localy */
+    const libraries = ReadFileFromJson()
+    const array = []
+
+    /* Loop array content and get information by library */
+    for (let [index, library] of libraries.entries()) {
+        const isEnd = index + 1 === libraries.length
         const version_ = library.name.split('_')[0].slice(3)
-        const drivers = await AccesPage(library.ip, library.user, library.password, version_, index == libraries.lenght)
-        return { library: this, drivers: drivers }
-    })
-)
- */
-await WriteFile(array)
+        const library_data = await AccesPage(library.ip, library.user, library.password, version_, isEnd)
+        array.push({ library: library, library_data: library_data })
+    }
 
-await SMTPMail()
+    await WriteFile(array)
 
-/* exit */
-process.exit(0)
+    await SMTPMail()
+}

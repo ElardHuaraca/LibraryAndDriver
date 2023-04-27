@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer'
 import './Extensions/ElementHandle.js'
 
-const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
+const browser = await puppeteer.launch({ headless: true, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
 
 const LIBRARIES_VERSION = async (...args) => {
     const [page, user_, password_, page_load_2, page_load_1, sleep, version, isEnd] = args
