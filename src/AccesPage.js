@@ -50,6 +50,7 @@ const AccesPage = async (ip, user_, password_, version_, isEnd) => {
     try {
         await page.goto(URL_BY_VERSION(version_, ip))
     } catch (e) {
+        console.log(e)
         page.close()
         return {
             drivers: [{
