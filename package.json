@@ -12,13 +12,14 @@
   "author": "Elard",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^8.32.0"
+    "eslint": "8.41.0",
+    "nodemon": "2.0.22"
   },
   "dependencies": {
-    "dotenv": "^16.0.3",
-    "node-cron": "^3.0.2",
-    "nodemailer": "^6.9.1",
-    "puppeteer": "^19.6.0"
+    "dotenv": "16.0.3",
+    "node-cron": "3.0.2",
+    "nodemailer": "6.9.2",
+    "puppeteer": "20.2.1"
   },
   "type": "module"
 }
