@@ -1,9 +1,9 @@
-import AccesPage from './src/AccesPage.js'
-import { ReadFileFromJson, WriteFile } from './src/ReadAndCreateFile.js'
 import SMTPMail from './src/SMTPMail.js'
 import dotenv from 'dotenv'
 import { EventEmitter } from 'events'
 import cron from 'node-cron'
+import { AccesPage } from './src/AccesPage.js'
+import { ReadFileFromJson, WriteFile } from './src/ReadAndCreateFile.js'
 
 EventEmitter.setMaxListeners(0)
 
@@ -15,7 +15,7 @@ cron.schedule('0 17 * * *', async () => { await app() })
 cron.schedule('0 23 * * *', async () => { await app() })
 
 let start = false
-const taskExample = cron.schedule('* * * * *', async () => {
+const taskExample = cron.schedule('* * * * * *', async () => {
     if (start) return
     start = true
     await app()
@@ -36,10 +36,9 @@ const app = async () => {
     const array = []
 
     /* Loop array content and get information by library */
-    for (let [index, library] of libraries.entries()) {
-        const isEnd = index + 1 === libraries.length
+    for (let [_, library] of libraries.entries()) {
         const version_ = library.name.split('_')[0].slice(3)
-        const library_data = await AccesPage(library.ip, library.user, library.password, version_, isEnd)
+        const library_data = await AccesPage(library.ip, library.user, library.password, version_)
         array.push({ library: library, library_data: library_data })
     }
 
