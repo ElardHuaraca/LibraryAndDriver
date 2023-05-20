@@ -15,6 +15,9 @@ cron.schedule('0 17 * * *', async () => { await app() })
 cron.schedule('0 23 * * *', async () => { await app() })
 
 const app = async () => {
+
+    console.log('Start app')
+
     /* read file json localy */
     const libraries = ReadFileFromJson()
     const array = []
@@ -30,4 +33,6 @@ const app = async () => {
     await WriteFile(array)
 
     await SMTPMail()
+
+    console.log('End app')
 }
