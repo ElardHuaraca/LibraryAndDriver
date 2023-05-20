@@ -14,9 +14,22 @@ cron.schedule('0 13 * * *', async () => { await app() })
 cron.schedule('0 17 * * *', async () => { await app() })
 cron.schedule('0 23 * * *', async () => { await app() })
 
+let start = false
+const taskExample = cron.schedule('* * * * *', async () => {
+    if (start) return
+    start = true
+    await app()
+    taskExample.stop()
+}, { scheduled: false })
+
+const date = new Date()
+const day = date.getDate().toString().padStart(2, '0')
+const month = (date.getMonth() + 1).toString().padStart(2, '0')
+const year = date.getFullYear().toString()
+
 const app = async () => {
 
-    console.log('Start app')
+    console.log('Start app', `${day}/${month}/${year} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`)
 
     /* read file json localy */
     const libraries = ReadFileFromJson()
@@ -34,5 +47,7 @@ const app = async () => {
 
     await SMTPMail()
 
-    console.log('End app')
+    console.log('End app', `${day}/${month}/${year} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`)
 }
+
+taskExample.start()
