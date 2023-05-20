@@ -1,21 +1,19 @@
 import puppeteer from 'puppeteer'
 import './Extensions/ElementHandle.js'
 
-const browser = await puppeteer.launch({ headless: true, args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
-
 const LIBRARIES_VERSION = async (...args) => {
-    const [page, user_, password_, page_load_2, page_load_1, sleep, version, isEnd] = args
+    const [page, user_, password_, page_load_2, page_load_1, sleep, version] = args
     switch (version) {
         case '6480':
-            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep)
         case '3040':
-            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep)
         case '2024':
-            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep)
         case '4048':
-            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep)
         case '4300':
-            return await Libary4300(page, user_, password_, page_load_2, page_load_1, sleep, isEnd)
+            return await Libary4300(page, user_, password_, page_load_2, page_load_1, sleep)
     }
 }
 
@@ -44,7 +42,9 @@ const STATUS = {
     'DEFAULT': 'WARNING'
 }
 
-const AccesPage = async (ip, user_, password_, version_, isEnd) => {
+const browser = await puppeteer.launch({ args: ["--window-size=1366,720", "--fast-start", "--disable-extensions", "--no-sandbox"] })
+
+const AccesPage = async (ip, user_, password_, version_) => {
     const page = await browser.newPage()
 
     try {
@@ -70,10 +70,10 @@ const AccesPage = async (ip, user_, password_, version_, isEnd) => {
     const page_load_2 = page.waitForNavigation({ waitUntil: 'networkidle2' })
     const sleep = async (ms = 1000) => await new Promise(r => setTimeout(r, ms))
     /* Authenticate and user selected in list*/
-    return await LIBRARIES_VERSION(page, user_, password_, page_load_2, page_load_1, sleep, version_, isEnd)
+    return await LIBRARIES_VERSION(page, user_, password_, page_load_2, page_load_1, sleep, version_)
 }
 
-async function Libary6480(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
+async function Libary6480(page, user_, password_, page_load_2, page_load_1, sleep) {
     try { await page.waitForSelector('#slctAccount_chosen', { timeout: 5000 }) }
     catch (e) { }
 
@@ -172,13 +172,12 @@ async function Libary6480(page, user_, password_, page_load_2, page_load_1, slee
         criticals.push(...descriptions)
     } else { criticals.push({ description: 'N.A.' }) }
 
-    if (isEnd) await browser.close()
-    else await page.close()
+    await page.close()
 
     return { drivers: list_, criticals: criticals }
 }
 
-async function Libary2024(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
+async function Libary2024(page, user_, password_, page_load_2, page_load_1, sleep) {
     let ListDrivers = []
 
     await page.waitForSelector('#ButtonRegion')
@@ -255,7 +254,6 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
     /* Verify if status error exist in library */
     const frame_left = getFrame(page, 'left')
     const errors = await frame_left.$eval('#greyPanel>table>tbody>tr:nth-child(4)>td:nth-child(2)', element => {
-        console.log(element)
         const name_src = element.querySelector('img').getAttribute('src')
         const type_status = name_src.split('.')[0]
         const isError = type_status === 'status_error'
@@ -266,16 +264,15 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
         else { return [{ description: 'N.A.' }] }
     })
 
-    if (isEnd) await browser.close()
-    else await page.close()
+    await page.close()
 
     return { drivers: ListDrivers, criticals: errors }
 }
 
-async function Libary4300(page, user_, password_, page_load_2, page_load_1, sleep, isEnd) {
+async function Libary4300(page, user_, password_, page_load_2, page_load_1, sleep) {
     const ListDrivers = []
     try { await page.waitForSelector('#slctAccount', { timeout: 5000 }) }
-    catch (e) { console.log(e) }
+    catch (e) { }
 
     await page.type('#slctAccount', user_ || process.env.USERNAME_LIB)
     await page.type('#logPwd', password_ || process.env.PASSWORD_LIB)
@@ -294,32 +291,33 @@ async function Libary4300(page, user_, password_, page_load_2, page_load_1, slee
     await page.waitForSelector('#TBL_DRIVE')
     const table = await page.$('#TBL_DRIVE')
 
-    table.$$('#drivenum').then(rows => {
-        rows.forEach(async (row) => {
-            const div_log_num = await row.$('#DRIVE_LOG_NUM')
-            const div_status = await row.$('#DRIVE_STATUS')
-            const div_activity = await row.$('#DRIVE_ACTIVITY')
-            const div_enable = await row.$('#DRIVE_ENABLED_HEAD')
-            const div_serial = await row.$('#DRIVE_SERIAL_NO')
+    const rows = await table.$$('#drivenum')
 
-            const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
-            const text_class = await (await div_status.getProperty('className')).jsonValue()
-            const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
-            const text_enable = await (await div_enable.getProperty('textContent')).jsonValue()
-            const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
+    const list = await Promise.all(rows.map(async (row) => {
+        const div_log_num = await row.$('#DRIVE_LOG_NUM')
+        const div_status = await row.$('#DRIVE_STATUS')
+        const div_activity = await row.$('#DRIVE_ACTIVITY')
+        const div_enable = await row.$('#DRIVE_ENABLED_HEAD')
+        const div_serial = await row.$('#DRIVE_SERIAL_NO')
 
-            ListDrivers.push({
-                id: text_num,
-                status: STATUS[text_class] || STATUS['DEFAULT'],
-                process: text_activity === ' ' ? 'N.A.' : text_activity,
-                powerfull: text_enable,
-                serial: text_serial,
-            })
-        })
-    })
+        const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
+        const text_class = await (await div_status.getProperty('className')).jsonValue()
+        const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
+        const text_enable = await (await div_enable.getProperty('textContent')).jsonValue()
+        const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
 
-    if (isEnd) await browser.close()
-    else await page.close()
+        return {
+            id: text_num,
+            status: STATUS[text_class] || STATUS['DEFAULT'],
+            process: text_activity === ' ' ? 'N.A.' : text_activity,
+            powerfull: text_enable,
+            serial: text_serial,
+        }
+    }))
+
+    ListDrivers.push(...list)
+
+    await page.close()
 
     return { drivers: ListDrivers, criticals: [{ description: 'N.A.' }] }
 }
@@ -330,4 +328,4 @@ function getFrame(page, name) {
     else return null;
 }
 
-export default AccesPage
+export { AccesPage }
