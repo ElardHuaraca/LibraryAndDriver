@@ -9,10 +9,10 @@ EventEmitter.setMaxListeners(0)
 
 dotenv.config()
 
-cron.schedule('0 8 * * *', async () => { await app() })
-cron.schedule('0 13 * * *', async () => { await app() })
-cron.schedule('0 17 * * *', async () => { await app() })
-cron.schedule('0 23 * * *', async () => { await app() })
+cron.schedule('0 0 8 * * *', async () => { await app() })
+cron.schedule('0 0 13 * * *', async () => { await app() })
+cron.schedule('0 0 17 * * *', async () => { await app() })
+cron.schedule('0 0 23 * * *', async () => { await app() })
 
 let start = false
 const taskExample = cron.schedule('* * * * * *', async () => {
@@ -21,9 +21,7 @@ const taskExample = cron.schedule('* * * * * *', async () => {
     start = true
     await app()
     taskExample.stop()
-}, {
-    scheduled: false
-})
+}, { scheduled: false })
 
 
 
