@@ -2,23 +2,23 @@ import puppeteer from 'puppeteer'
 import './Extensions/ElementHandle.js'
 
 const LIBRARIES_VERSION = async (...args) => {
-    const [page, user_, password_, page_load_2, page_load_1, sleep, version] = args
+    const [page, user_, password_, sleep, version] = args
     switch (version) {
         case '6480':
             console.log('version 6480')
-            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep)
+            return await Libary6480(page, user_, password_, sleep)
         case '3040':
             console.log('version 3040')
-            return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep)
+            return await Libary6480(page, user_, password_, sleep)
         case '2024':
             console.log('version 2024')
-            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep)
+            return await Libary2024(page, user_, password_, sleep)
         case '4048':
             console.log('version 4048')
-            return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep)
+            return await Libary2024(page, user_, password_, sleep)
         case '4300':
             console.log('version 4300')
-            return await Libary4300(page, user_, password_, page_load_2, page_load_1, sleep)
+            return await Libary4300(page, user_, password_, sleep)
     }
 }
 
@@ -71,14 +71,12 @@ const AccesPage = async (ip, user_, password_, version_) => {
     /* configurations */
     await page.setViewport({ width: 1366, height: 720 })
 
-    const page_load_1 = page.waitForNavigation({ waitUntil: 'networkidle0' })
-    const page_load_2 = page.waitForNavigation({ waitUntil: 'networkidle2' })
     const sleep = async (ms = 1000) => await new Promise(r => setTimeout(r, ms))
     /* Authenticate and user selected in list*/
-    return await LIBRARIES_VERSION(page, user_, password_, page_load_2, page_load_1, sleep, version_)
+    return await LIBRARIES_VERSION(page, user_, password_, sleep, version_)
 }
 
-async function Libary6480(page, user_, password_, page_load_2, page_load_1, sleep) {
+async function Libary6480(page, user_, password_, sleep) {
     try { await page.waitForSelector('#slctAccount_chosen', { timeout: 5000 }) }
     catch (e) { console.log(e) }
 
@@ -108,7 +106,7 @@ async function Libary6480(page, user_, password_, page_load_2, page_load_1, slee
     await btn_status.click()
 
     /* wait page load content */
-    await page_load_1
+    await page.waitForNavigation({ waitUntil: 'networkidle0' })
 
     await sleep(3000)
 
@@ -182,7 +180,7 @@ async function Libary6480(page, user_, password_, page_load_2, page_load_1, slee
     return { drivers: list_, criticals: criticals }
 }
 
-async function Libary2024(page, user_, password_, page_load_2, page_load_1, sleep) {
+async function Libary2024(page, user_, password_, sleep) {
     let ListDrivers = []
 
     await page.waitForSelector('#ButtonRegion')
@@ -274,7 +272,7 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
     return { drivers: ListDrivers, criticals: errors }
 }
 
-async function Libary4300(page, user_, password_, page_load_2, page_load_1, sleep) {
+async function Libary4300(page, user_, password_, sleep) {
     const ListDrivers = []
     try { await page.waitForSelector('#slctAccount', { timeout: 5000 }) }
     catch (e) { console.log(e) }
@@ -283,14 +281,28 @@ async function Libary4300(page, user_, password_, page_load_2, page_load_1, slee
     await page.type('#logPwd', password_ || process.env.PASSWORD_LIB)
     await page.click('#BTNLOGIN')
 
-    /* wait page load content */
-    await page_load_2
+    try {
+        await page.waitForNavigation({ waitUntil: 'networkidle2' })
+    }
+    catch (e) {
+        console.log(e)
+        await page.close()
+        return {
+            drivers: [{
+                id: 'N.A.',
+                status: 'N.A.',
+                process: 'N.A.',
+                powerfull: 'N.A.',
+                serial: 'N.A.'
+            }],
+            criticals: [{ description: 'N.A' }]
+        }
+    }
 
     await page.waitForSelector('#mnuDrives')
     const btn_drivers = await page.$('#mnuDrives')
     await btn_drivers.click()
 
-    await page_load_1
     await sleep(3000)
 
     await page.waitForSelector('#TBL_DRIVE')
