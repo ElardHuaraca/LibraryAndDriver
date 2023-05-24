@@ -98,7 +98,7 @@ async function Libary6480(page, user_, password_, sleep) {
     await btn.click()
 
     /* wait page load content */
-    await page_load_2
+    await page.waitForNavigation({ waitUntil: 'networkidle2' })
 
     /* Click on button for view status*/
     await page.waitForSelector('#modStatus')
@@ -159,7 +159,7 @@ async function Libary6480(page, user_, password_, sleep) {
     if (isVisible) {
         await option.click()
 
-        await page_load_2
+        await page.waitForNavigation({ waitUntil: 'networkidle2' })
         await sleep(3000)
 
         await page.waitForSelector('#id_TicketLogTableContainer')
@@ -190,7 +190,7 @@ async function Libary2024(page, user_, password_, sleep) {
 
 
     /* wait page load content */
-    await page_load_2
+    await page.waitForNavigation({ waitUntil: 'networkidle2' })
 
     /* find frame and click on button respect */
     let frame = getFrame(page, 'tabs')
