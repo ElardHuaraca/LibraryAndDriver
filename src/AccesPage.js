@@ -5,14 +5,19 @@ const LIBRARIES_VERSION = async (...args) => {
     const [page, user_, password_, page_load_2, page_load_1, sleep, version] = args
     switch (version) {
         case '6480':
+            console.log('version 6480')
             return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep)
         case '3040':
+            console.log('version 3040')
             return await Libary6480(page, user_, password_, page_load_2, page_load_1, sleep)
         case '2024':
+            console.log('version 2024')
             return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep)
         case '4048':
+            console.log('version 4048')
             return await Libary2024(page, user_, password_, page_load_2, page_load_1, sleep)
         case '4300':
+            console.log('version 4300')
             return await Libary4300(page, user_, password_, page_load_2, page_load_1, sleep)
     }
 }
@@ -75,7 +80,7 @@ const AccesPage = async (ip, user_, password_, version_) => {
 
 async function Libary6480(page, user_, password_, page_load_2, page_load_1, sleep) {
     try { await page.waitForSelector('#slctAccount_chosen', { timeout: 5000 }) }
-    catch (e) { }
+    catch (e) { console.log(e) }
 
     let div = await page.$('#slctAccount_chosen')
     div ??= await page.$('#slctAccount')
@@ -272,7 +277,7 @@ async function Libary2024(page, user_, password_, page_load_2, page_load_1, slee
 async function Libary4300(page, user_, password_, page_load_2, page_load_1, sleep) {
     const ListDrivers = []
     try { await page.waitForSelector('#slctAccount', { timeout: 5000 }) }
-    catch (e) { }
+    catch (e) { console.log(e) }
 
     await page.type('#slctAccount', user_ || process.env.USERNAME_LIB)
     await page.type('#logPwd', password_ || process.env.PASSWORD_LIB)
