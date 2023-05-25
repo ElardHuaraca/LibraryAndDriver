@@ -16,7 +16,7 @@ const smtpMail = async () => {
     let count = 0
 
     do {
-        transporter.sendMail({
+        await transporter.sendMail({
             from: process.env.EMAIL_SMTP,
             to: process.env.FROM_SMTP,
             subject: 'REPORTE LIBRERIAS ROBOTICAS',
