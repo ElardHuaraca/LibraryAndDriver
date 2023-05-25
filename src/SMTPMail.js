@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import { ReadFile, DeleteFile } from './ReadAndCreateFile.js'
+import { ReadFile } from './ReadAndCreateFile.js'
 
 const smtpMail = async () => {
 
@@ -13,14 +13,21 @@ const smtpMail = async () => {
         }
     })
 
-    await transporter.sendMail({
-        from: process.env.EMAIL_SMTP,
-        to: process.env.FROM_SMTP,
-        subject: 'REPORTE LIBRERIAS ROBOTICAS',
-        html: ReadFile()
-    }).catch((error) => {
-        console.log(error)
-    })
+    let count = 0
+
+    do {
+        await transporter.sendMail({
+            from: process.env.EMAIL_SMTP,
+            to: process.env.FROM_SMTP,
+            subject: 'REPORTE LIBRERIAS ROBOTICAS',
+            html: ReadFile()
+        }).then(() => { count = 0 }).catch((error) => {
+            console.log(error)
+            count++
+        })
+
+    }
+    while (count <= 4 & count >= 1)
 }
 
 export default smtpMail
