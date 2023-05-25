@@ -26,6 +26,8 @@ const smtpMail = async () => {
             count++
         })
 
+        console.log('Try send email: ' + count)
+
     } while (count <= 4 & count >= 1)
 }
 
