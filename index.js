@@ -11,7 +11,7 @@ dotenv.config()
 
 const times = ['8', '13', '17', '23']
 
-const mainTask = schedule('* * * * * *', async () => {
+const mainTask = schedule('0 0 * * * *', async () => {
     const hour = new Date().getHours().toString()
     if (!times.includes(hour)) return
     await app()
@@ -27,14 +27,13 @@ const taskExample = schedule('* * * * * *', async () => {
 
 }, { scheduled: false })
 
-
+/* read file json localy */
+const libraries = ReadFileFromJson()
 
 const app = async () => {
 
     console.log('Start app', getDate())
 
-    /* read file json localy */
-    const libraries = ReadFileFromJson()
     const array = []
 
     /* Loop array content and get information by library */
