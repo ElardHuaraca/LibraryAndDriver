@@ -16,18 +16,17 @@ const smtpMail = async () => {
     let count = 0
 
     do {
-        await transporter.sendMail({
+        transporter.sendMail({
             from: process.env.EMAIL_SMTP,
             to: process.env.FROM_SMTP,
             subject: 'REPORTE LIBRERIAS ROBOTICAS',
             html: ReadFile()
-        }).then(() => { count = 0 }).catch((error) => {
+        }).then((_) => { count = 0 }).catch((error) => {
             console.log(error)
             count++
         })
 
-    }
-    while (count <= 4 & count >= 1)
+    } while (count <= 4 & count >= 1)
 }
 
 export default smtpMail
