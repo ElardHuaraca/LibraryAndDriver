@@ -19,6 +19,9 @@ const LIBRARIES_VERSION = async (...args) => {
         case '4300':
             console.log('version 4300')
             return await Libary4300(page, user_, password_, sleep)
+        case '4500':
+            console.log('version 4500')
+            return await Libary4300(page, user_, password_, sleep)
     }
 }
 
@@ -32,6 +35,8 @@ const URL_BY_VERSION = (version, ip) => {
             return `http://${ip}/login.ssi`
         case '4048':
             return `http://${ip}/login.ssi`
+        case '4500':
+            return `http://${ip}/web`
         default:
             return `http://${ip}/login.php`
     }
@@ -43,6 +48,8 @@ const STATUS = {
     'Ready': 'OK',
     'Writing': 'OK',
     'Idle': 'OK',
+    'Online': 'OK',
+    'Ready': 'OK',
     'Error': 'ERROR',
     'DEFAULT': 'WARNING'
 }
@@ -274,12 +281,24 @@ async function Libary2024(page, user_, password_, sleep) {
 
 async function Libary4300(page, user_, password_, sleep) {
     const ListDrivers = []
-    try { await page.waitForSelector('#slctAccount', { timeout: 5000 }) }
+    try {
+        await page.waitForSelector('#slctAccount', { timeout: 5000 })
+        await page.waitForSelector('#form', { timeout: 5000 })
+    }
     catch (e) { console.log(e) }
 
-    await page.type('#slctAccount', user_ || process.env.USERNAME_LIB)
-    await page.type('#logPwd', password_ || process.env.PASSWORD_LIB)
-    await page.click('#BTNLOGIN')
+    let inputUser = await page.$('#slctAccount')
+    inputUser ??= await page.$('#user')
+
+    let inputPassword = await page.$('#logPwd')
+    inputPassword ??= await page.$('#password')
+
+    let btnLogin = await page.$('#BTNLOGIN')
+    btnLogin ??= await page.$('#loginSet')
+
+    await inputUser.type(user_ || process.env.USERNAME_LIB)
+    await inputPassword.type(password_ || process.env.PASSWORD_LIB)
+    await btnLogin.click('#BTNLOGIN')
 
     try {
         await page.waitForNavigation({ waitUntil: 'networkidle2' })
@@ -299,40 +318,77 @@ async function Libary4300(page, user_, password_, sleep) {
         }
     }
 
-    await page.waitForSelector('#mnuDrives')
-    const btn_drivers = await page.$('#mnuDrives')
+    try {
+        await page.waitForSelector('#mnuDrives', { timeout: 5000 })
+        await page.waitForSelector('#evo_widget_TBFisheyeItem_2', { timeout: 5000 })
+    } catch (e) { console.log(e) }
+
+    let btn_drivers = await page.$('#mnuDrives')
+    btn_drivers ??= await page.$('#evo_widget_TBFisheyeItem_2')
     await btn_drivers.click()
 
     await sleep(3000)
 
-    await page.waitForSelector('#TBL_DRIVE')
-    const table = await page.$('#TBL_DRIVE')
+    try {
+        await page.waitForSelector('#TBL_DRIVE')
+        await page.waitForSelector('.dojoxGridView div div div')
+    } catch (e) { console.log(e) }
 
-    const rows = await table.$$('#drivenum')
+    let table = await page.$('#TBL_DRIVE')
 
-    const list = await Promise.all(rows.map(async (row) => {
-        const div_log_num = await row.$('#DRIVE_LOG_NUM')
-        const div_status = await row.$('#DRIVE_STATUS')
-        const div_activity = await row.$('#DRIVE_ACTIVITY')
-        const div_enable = await row.$('#DRIVE_ENABLED_HEAD')
-        const div_serial = await row.$('#DRIVE_SERIAL_NO')
+    if (table !== null) {
+        const rows = await table.$$('#drivenum')
 
-        const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
-        const text_class = await (await div_status.getProperty('className')).jsonValue()
-        const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
-        const text_enable = await (await div_enable.getProperty('textContent')).jsonValue()
-        const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
+        const list = await Promise.all(rows.map(async (row) => {
+            const div_log_num = await row.$('#DRIVE_LOG_NUM')
+            const div_status = await row.$('#DRIVE_STATUS')
+            const div_activity = await row.$('#DRIVE_ACTIVITY')
+            const div_enable = await row.$('#DRIVE_ENABLED_HEAD')
+            const div_serial = await row.$('#DRIVE_SERIAL_NO')
 
-        return {
-            id: text_num,
-            status: STATUS[text_class] || STATUS['DEFAULT'],
-            process: text_activity === ' ' ? 'N.A.' : text_activity,
-            powerfull: text_enable,
-            serial: text_serial,
-        }
-    }))
+            const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
+            const text_class = await (await div_status.getProperty('className')).jsonValue()
+            const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
+            const text_enable = await (await div_enable.getProperty('textContent')).jsonValue()
+            const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
 
-    ListDrivers.push(...list)
+            return {
+                id: text_num,
+                status: STATUS[text_class] || STATUS['DEFAULT'],
+                process: text_activity === ' ' ? 'N.A.' : text_activity,
+                powerfull: text_enable,
+                serial: text_serial,
+            }
+        }))
+
+        ListDrivers.push(...list)
+    } else {
+        table ??= await page.$('.dojoxGridView div div div')
+        const rows = await table.$$('.dojoxGridRow tr')
+
+        let index = 0
+
+        const list = await Promise.all(rows.map(async (row) => {
+            const status = await row.$('td:nth-child(4)')
+            const process = await row.$('td:nth-child(15)')
+            const powerfull = 'N.A.'
+            const serial = await row.$('td:nth-child(6)')
+
+            const text_status = await (await status.getProperty('textContent')).jsonValue()
+            const text_process = await (await process.getProperty('textContent')).jsonValue()
+            const text_serial = await (await serial.getProperty('textContent')).jsonValue()
+
+            return {
+                id: ++index,
+                status: STATUS[text_status] || STATUS['DEFAULT'],
+                process: text_process,
+                powerfull: powerfull,
+                serial: text_serial,
+            }
+        }))
+
+        ListDrivers.push(...list)
+    }
 
     await page.close()
 
