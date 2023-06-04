@@ -3,7 +3,8 @@ import fs from 'fs'
 const FILENAME = "libraries.html"
 
 export function ReadFile() {
-    return fs.readFileSync(FILENAME).toString()
+    const file = fs.readFileSync(FILENAME)
+    return file.toString()
 }
 
 /* Read File libraries.json localy in project */
@@ -21,16 +22,20 @@ export async function WriteFile(listLibrary) {
     file.on('ready', () => {
         file.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Libraries</title></head><body>')
         file.write('<table style="border-collapse:collapse; width:100%;text-align:center;" border="1">')
-        file.write('<thead><tr><th scope="col">Libreria</th><th scope="col">Drives</th><th scope="col">Serial</th><th scope="col">Estatus</th><th scope="col">Proceso</th><th scope="col">On/Of</th><th scope="col">MSG Criticos</th><th scope="col">IP</th></tr></thead>')
+        file.write('<thead><tr><th scope="col">Libreria</th><th scope="col">Drives</th><th scope="col">Serial</th><th scope="col">Tipo de Cinta</th><th scope="col">Estatus</th><th scope="col">Proceso</th><th scope="col">On/Of</th><th scope="col">MSG Criticos</th><th scope="col">IP</th></tr></thead>')
         file.write('<tbody>')
         listLibrary.forEach((item) => {
             const { library, library_data } = item
             file.write(`<tr><td rowspan="${library_data.drivers.length}">${library.name}</td>`)
 
+            const rangesAndType = LIST_MAGENETIC_TAPE(library.drivers || [])
+
             library_data.drivers.forEach((driver, index) => {
                 if (index > 0) file.write('<tr>')
+                const type = TYPE_MAGENETIC_TAPE(driver.id, rangesAndType)
                 file.write(`<td>Drive ${driver.id}</td>`)
                 file.write(`<td>${driver.serial}</td>`)
+                file.write(`<td>${type}</td>`)
                 file.write(`<td>${driver.status}</td>`)
                 file.write(`<td>${driver.process}</td>`)
                 file.write(`<td>${driver.powerfull}</td>`)
@@ -55,4 +60,26 @@ export async function WriteFile(listLibrary) {
 
 export function DeleteFile() {
     fs.unlinkSync(FILENAME)
+}
+
+const LIST_MAGENETIC_TAPE = (list) => {
+    let first = 1
+    return list.map((item) => {
+        const itemSplit = item.split('=')
+        const indice = itemSplit[0].includes('*') ? itemSplit[0].indexOf('*') : itemSplit[0].indexOf(' ')
+        const lastRange = itemSplit[0].slice(indice + 1, itemSplit[0].length)
+        const firstRange = first
+        first = lastRange + 1
+        return {
+            firstRange: firstRange,
+            lastRange: lastRange,
+            type: itemSplit[1]
+        }
+    })
+}
+
+const TYPE_MAGENETIC_TAPE = (id, rangesAndType) => {
+    if (rangesAndType.length === 0) return 'N.A.'
+    const type = rangesAndType.find((item) => item.firstRange <= id <= item.lastRange)
+    return type ? type.type : 'N.A.'
 }
