@@ -63,13 +63,15 @@ export function DeleteFile() {
 }
 
 const LIST_MAGENETIC_TAPE = (list) => {
-    let first = 1
+    let first = 0
     return list.map((item) => {
         const itemSplit = item.split('=')
-        const indice = itemSplit[0].includes('*') ? itemSplit[0].indexOf('*') : itemSplit[0].indexOf(' ')
-        const lastRange = itemSplit[0].slice(indice + 1, itemSplit[0].length)
-        const firstRange = first
-        first = lastRange + 1
+        const includes = itemSplit[0].includes('*')
+        const indice = includes ? itemSplit[0].indexOf('*') : itemSplit[0].indexOf(' ')
+        const last = itemSplit[0].slice(indice + 1, itemSplit[0].length)
+        const lastRange = includes ? Number(last) + first : Number(last)
+        const firstRange = first + 1
+        first = lastRange
         return {
             firstRange: firstRange,
             lastRange: lastRange,
@@ -80,6 +82,6 @@ const LIST_MAGENETIC_TAPE = (list) => {
 
 const TYPE_MAGENETIC_TAPE = (id, rangesAndType) => {
     if (rangesAndType.length === 0) return 'N.A.'
-    const type = rangesAndType.find((item) => item.firstRange <= id <= item.lastRange)
+    const type = rangesAndType.find(({ firstRange, lastRange }) => firstRange <= Number(id) & Number(id) <= lastRange)
     return type ? type.type : 'N.A.'
 }
