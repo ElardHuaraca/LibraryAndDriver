@@ -348,9 +348,13 @@ async function Libary4300(page, user_, password_, sleep) {
 
             const text_num = await (await div_log_num.getProperty('textContent')).jsonValue()
             const text_class = await (await div_status.getProperty('className')).jsonValue()
-            const text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
+            let text_activity = await (await div_activity.getProperty('textContent')).jsonValue()
             const text_enable = await (await div_enable.getProperty('textContent')).jsonValue()
             const text_serial = await (await div_serial.getProperty('textContent')).jsonValue()
+
+            const cartridge = await row.$('.field-section-body > div > div:nth-child(1) > div:nth-child(5) > div:nth-child(4) > label')
+            const text_cartridge = await (await cartridge.getProperty('textContent')).jsonValue()
+            text_activity = text_cartridge === 'N/A' ? text_activity : text_cartridge
 
             return {
                 id: text_num,
