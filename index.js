@@ -9,7 +9,7 @@ EventEmitter.setMaxListeners(0)
 
 dotenv.config()
 
-const times = ['8', '13', '17', '23']
+const times = ['0', '3', '6', '8', '11', '14', '17', '20', '22']
 
 const mainTask = schedule('0 0 * * * *', async () => {
     const hour = new Date().getHours().toString()
