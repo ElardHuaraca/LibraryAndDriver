@@ -49,7 +49,7 @@ const STATUS = {
     'Writing': 'OK',
     'Idle': 'OK',
     'Online': 'OK',
-    'Ready': 'OK',
+    'Unloading': 'OK',
     'Error': 'ERROR',
     'DEFAULT': 'WARNING'
 }
