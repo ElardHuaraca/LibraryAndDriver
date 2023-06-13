@@ -12,8 +12,9 @@ const smtpMail = async () => {
         }
     })
 
-    let count = 0
+    let count = 1
 
+    console.log('Try send email: ' + count)
     do {
         await transporter.sendMail({
             from: process.env.EMAIL_SMTP,
@@ -25,7 +26,7 @@ const smtpMail = async () => {
             count++
         })
 
-        console.log('Try send email: ' + count)
+
 
     } while (count <= 4 & count >= 1)
 }
