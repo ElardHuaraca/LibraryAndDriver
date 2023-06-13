@@ -5,7 +5,11 @@ const smtpMail = async () => {
 
     let transporter = nodemailer.createTransport({
         host: '10.100.13.31',
-        port: 25
+        port: 25,
+        secure: false,
+        tls: {
+            rejectUnauthorized: false
+        }
     })
 
     let count = 0
